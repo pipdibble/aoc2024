@@ -6,7 +6,7 @@ const data = readFileSync('./input.txt', {
 });
 
 const orderRegex = /(\d+)\|(\d+)/gi;
-const updateRegex = /(\d+)(,\d+)+/gi;
+const updateRegex = /(\d+)(?:,(\d+))+/gi;
 const orders = [...data.matchAll(orderRegex)];
 const updates = [...data.matchAll(updateRegex)];
 
