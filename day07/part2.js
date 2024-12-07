@@ -7,11 +7,8 @@ const data = readFileSync('./input.txt', {
 
 const dataArr = data.split('\r\n');
 const findSolution = (accumulator, test, operands) => {
-  if (operands.length == 0 && accumulator == test) {
-    return true;
-  }
-  if (operands.length == 0 && accumulator != test)
-    return false;
+  if (operands.length == 0) 
+    return accumulator == test;
   if (accumulator > test)
     return false;
   const i = operands.shift();
