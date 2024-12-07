@@ -13,63 +13,74 @@ for (let y = 0; y < dataArr.length; y++) {
       guardPosition = [y, x];
   }
 }
-let onMap = true;
-let turns = [];
-let loops = new Set();
-while(onMap) {
-  const oldY = guardPosition[0];
-  const oldX = guardPosition[1];
-  const newY = oldY + guardDirection[0];
-  const newX = oldX + guardDirection[1];
-  dataArr[oldY][oldX] = 'X';
-  if (newY < 0 || newY >= dataArr.length)
-    onMap = false;
-  if (newX < 0 || newX >= dataArr[newY].length)
-    onMap = false;
-  if (dataArr[newY][newX] == '#') {
-    turns.push([oldY,oldX]);
-    // uh-on we hit an obstruction!
-    switch(guardDirection.toString()) {
-      case "-1,0":
-        guardDirection = [0, 1];
-        break;
-      case "0,1":
-        guardDirection = [1, 0];
-        break;
-      case "1,0":
-        guardDirection = [0, -1];
-        break;
-      case "0,-1":
-        guardDirection = [-1, 0];
-        break;
-      default:
-        console.log("case go brrrrrrrrrrr");
-    }
-  } else {
-    guardPosition = [newY, newX];
-    const t = turns.filter((p) => {
-      return !(p[0] == oldY && p[1] == oldX) && (p[0] == oldY || p[1] == oldX);
-    });
-    if (t.length >= 2) {
-      // Got a potential box with 2 other turning points on the same plane
-      const yVals = [];
-      const xVals = [];
-      for (const vals of t) {
-       if (vals[0] != oldY)
-         yVals.push(vals[0])
-       if (vals[1] != oldX)
-         xVals.push(vals[1])
+const walkGuard = (start, direction, map, route) => {
+  let onMap = true;
+  let steps = 0;
+  while (onMap) {
+    const oldY = start[0];
+    const oldX = start[1];
+    const newY = oldY + direction[0];
+    const newX = oldX + direction[1];
+    map[oldY][oldX] = 'X';
+    if (newY < 0 || newY >= map.length)
+      onMap = false;
+    if (onMap && (newX < 0 || newX >= map[newY].length))
+      onMap = false;
+    if (onMap && map[newY][newX] == '#') {
+      switch(direction.toString()) {
+        case "-1,0":
+          direction = [0, 1];
+          break;
+        case "0,1":
+          direction = [1,0];
+          break;
+        case "1,0":
+          direction = [0,-1];
+          break;
+        case "0,-1":
+          direction = [-1,0];
+          break;
       }
-      for (const y of yVals) {
-        for (const x of xVals) {
-          // Have travelled to a 4th point to make a box/circle?
-          if (dataArr[y][x] == 'X') {
-            loops.add([newY, newX].toString());
-          }
+    } else {
+      const routeId = direction.toString() + ',' + oldY.toString() + ',' + oldX.toString();
+      if (onMap) {
+        if (route.has(routeId)) {
+          return [Infinity, map, route];
+        } else {
+          route.add(routeId);
         }
+        steps++
+        start = [newY, newX];
       }
     }
   }
+  return [steps, map, route];
 }
-console.log(dataArr.flat().filter((x) => x == 'X').length);
-console.log(loops.size);
+const [steps,,route] = walkGuard([...guardPosition], [...guardDirection], dataArr, new Set());
+console.log("steps:", steps);
+console.log("Unique locations: ", (dataArr.flat().filter(x => x == 'X')).length);
+// Part 2
+const partTwo = new Set();
+/*
+for (const r of route.values()) {
+  const rArr = r.split(',');
+  const y = rArr[2];
+  const x = rArr[3];
+  const newMap = data.split('\r\n').map(x => x.split(''));
+  newMap[y][x] = '#';
+  const [steps,,] = walkGuard([...guardPosition], [...guardDirection], newMap, new Set());
+  if (steps == Infinity)
+    partTwo.add(y + ',' + x);
+}
+*/
+for (let y = 0; y < dataArr.length; y++) {
+  for (let x = 0; x <  dataArr[y].length; x++) {
+    const newMap = data.split('\r\n').map(x => x.split(''));
+    newMap[y][x] = '#';
+    const [steps,,] = walkGuard([...guardPosition], [...guardDirection], newMap, new Set());
+    if (steps == Infinity)
+      partTwo.add(y + ',' + x);
+  }
+}
+console.log("Infinite loops: ",partTwo.size);
+
