@@ -61,18 +61,20 @@ console.log("steps:", steps);
 console.log("Unique locations: ", (dataArr.flat().filter(x => x == 'X')).length);
 // Part 2
 const partTwo = new Set();
-/*
 for (const r of route.values()) {
   const rArr = r.split(',');
   const y = rArr[2];
   const x = rArr[3];
-  const newMap = data.split('\r\n').map(x => x.split(''));
-  newMap[y][x] = '#';
-  const [steps,,] = walkGuard([...guardPosition], [...guardDirection], newMap, new Set());
-  if (steps == Infinity)
-    partTwo.add(y + ',' + x);
+  if (!(y == guardPosition[0] && x == guardPosition[1])) {
+    const newMap = data.split('\r\n').map(x => x.split(''));
+    newMap[y][x] = '#';
+    const [steps,,] = walkGuard([...guardPosition], [...guardDirection], newMap, new Set());
+    if (steps == Infinity)
+      partTwo.add(y + ',' + x);
+  }
 }
-*/
+/*
+// Brute force 🤮
 for (let y = 0; y < dataArr.length; y++) {
   for (let x = 0; x <  dataArr[y].length; x++) {
     const newMap = data.split('\r\n').map(x => x.split(''));
@@ -82,5 +84,6 @@ for (let y = 0; y < dataArr.length; y++) {
       partTwo.add(y + ',' + x);
   }
 }
-console.log("Infinite loops: ",partTwo.size);
+*/
+console.log("Infinite loops: ",partTwo.size + 1);
 
