@@ -21,6 +21,11 @@ const walkGuard = (start, direction, map, route) => {
     const oldX = start[1];
     const newY = oldY + direction[0];
     const newX = oldX + direction[1];
+    const routeId = direction.toString() + ',' + oldY.toString() + ',' + oldX.toString();
+    if (route.has(routeId))
+      return [Infinity, map, route];
+    else
+      route.add(routeId);
     map[oldY][oldX] = 'X';
     if (newY < 0 || newY >= map.length)
       onMap = false;
@@ -42,13 +47,7 @@ const walkGuard = (start, direction, map, route) => {
           break;
       }
     } else {
-      const routeId = direction.toString() + ',' + oldY.toString() + ',' + oldX.toString();
       if (onMap) {
-        if (route.has(routeId)) {
-          return [Infinity, map, route];
-        } else {
-          route.add(routeId);
-        }
         steps++
         start = [newY, newX];
       }
@@ -60,12 +59,12 @@ const [steps,,route] = walkGuard([...guardPosition], [...guardDirection], dataAr
 console.log("steps:", steps);
 console.log("Unique locations: ", (dataArr.flat().filter(x => x == 'X')).length);
 // Part 2
-const partTwo = new Set();
+let partTwo = new Set();
 for (const r of route.values()) {
   const rArr = r.split(',');
   const y = rArr[2];
   const x = rArr[3];
-  if (!(y == guardPosition[0] && x == guardPosition[1])) {
+  if (!(y == guardPosition[0] && x == guardPosition[1]) && !partTwo.has(y + ',' + x)) {
     const newMap = data.split('\r\n').map(x => x.split(''));
     newMap[y][x] = '#';
     const [steps,,] = walkGuard([...guardPosition], [...guardDirection], newMap, new Set());
@@ -85,5 +84,4 @@ for (let y = 0; y < dataArr.length; y++) {
   }
 }
 */
-console.log("Infinite loops: ",partTwo.size + 1);
-
+console.log("Infinite loops: ",partTwo.size);
