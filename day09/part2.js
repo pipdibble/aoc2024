@@ -37,7 +37,7 @@ try {
 
         let firstSpace;
         let count = 0;
-        for (firstSpace = 0; count != fileSize && firstSpace >= 0; firstSpace++) {
+        for (firstSpace = disk.indexOf('.'); count != fileSize && firstSpace >= 0; firstSpace++) {
           if (disk[firstSpace] == '.') {
             count++;
           } else {
@@ -65,7 +65,7 @@ try {
     }
     let result = 0;
     for (let i = 0; i < disk.length; i++) {
-      if (parseInt(disk[i]))
+      if (disk[i] != '.')
         result += i * parseInt(disk[i]);
     }
     console.log("Result: ", result);
