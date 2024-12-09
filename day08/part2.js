@@ -30,9 +30,9 @@ const points = new Set();
 for (const antennae of Object.keys(map)) {
   const count = map[antennae].length;
   for (const coord in map[antennae]) {
+    const a1 = map[antennae][coord];
     for (let comp = 0; comp < count; comp++) {
       if (coord != comp) {
-        const a1 = map[antennae][coord];
         const a2 = map[antennae][comp];
         const xDiff = a2[0] - a1[0];
         const yDiff = a2[1] - a1[1];
