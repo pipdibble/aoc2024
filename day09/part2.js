@@ -1,5 +1,4 @@
 import { open } from 'node:fs/promises';
-import { argv0 } from 'node:process';
 import readline from 'node:readline/promises';
 
 let fd;
@@ -8,7 +7,7 @@ try {
   const stream = fd.createReadStream();
   const rd = readline.createInterface({
     input: stream,
-    output: process.stdout,
+    output: null,
     console: false
   });
   for await (const line of rd) {
@@ -27,7 +26,6 @@ try {
       return acc;
     }, []);
     let fileSize = 0;
-    //console.log(disk);
     for (let i = disk.length-1; i >= 0; i -= fileSize) {
       fileSize = 0;
       if (disk[i] != '.') {
@@ -46,17 +44,14 @@ try {
           if (firstSpace > i)
             firstSpace = -2;
         }
-        if (firstSpace >= 0)
-          firstSpace -= fileSize;
 
         if (firstSpace >= 0 && firstSpace <= i) {
+          firstSpace -= fileSize;
           for (let x = 0; x < fileSize; x++) {
             disk[firstSpace + x] = disk[i - x];
             disk[i - x] = '.';
           }
         }
-        //console.log("i", i, "fileSize", fileSize, "firstSpace", firstSpace);
-        //console.log(disk);
       } else {
         while(disk[i] == '.' && i >= 0) {
           i--;
