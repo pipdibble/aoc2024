@@ -7,8 +7,12 @@ const data = readFileSync('./input.txt', {
 
 const dataArr = data.split(' ').map(x => parseInt(x));
 console.table(dataArr);
+const lookup = {};
 
 const blinkProcess = (elem, r) => {
+  const l = ''.concat(elem, ':', r);
+  if (Object.hasOwn(lookup, l))
+    return lookup[l];
   if (r == 0) {
     return 1;
   }
@@ -25,6 +29,7 @@ const blinkProcess = (elem, r) => {
   } else {
     retVal += blinkProcess(elem * 2024, r);
   }
+  lookup[l] = retVal;
   return retVal;
 }
 let blinks = 25;
