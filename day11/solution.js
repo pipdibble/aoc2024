@@ -20,10 +20,11 @@ const blinkProcess = (elem, r) => {
   let retVal = 0;
   if (elem == 0) {
     retVal = blinkProcess(1, r);
-  } else if (elem.toString().length % 2 == 0) {
-    const mid = elem.toString().length / 2;
-    const n1 = parseInt(elem.toString().slice(0,mid));
-    const n2 = parseInt(elem.toString().slice(mid));
+  } else if (Math.log10(elem) % 2 >= 1) {
+    const nStr = elem.toString();
+    const mid = nStr.length / 2;
+    const n1 = parseInt(nStr.slice(0,mid));
+    const n2 = parseInt(nStr.slice(mid));
     retVal += blinkProcess(n1, r);
     retVal += blinkProcess(n2, r);
   } else {
