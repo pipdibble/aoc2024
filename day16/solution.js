@@ -41,13 +41,16 @@ class Player {
   direction = 'east';
   score = 0;
   path = [];
+  alive = true;
 
-  constructor(x, y, direction='east', score = 0, path = []) {
+  constructor(x, y, direction='east', score = 0, path = [], alive = true) {
     this.x = x;
     this.y = y;
     this.direction = direction;
     this.score = score;
     this.path = path;
+    this.path.push([x, y]);
+    this.alive = alive;
   }
 
   get location() {
@@ -86,6 +89,14 @@ class Player {
     this.direction = directions[this.direction].moves[1];
     this.score += 1000;
   }
+
+  kill() {
+    this.alive = false;
+  }
+  
+  get alive() {
+    return this.alive;
+  }
 }
 
 let initX = 0;
@@ -98,44 +109,78 @@ for (let y = 0; y < height; y++) {
     }
   }
 }
-const players = [];
-const winners = [];
+let players = [];
+let winners = [];
+const steps = {};
 
 const main = (x, y) => {
   const p1 = new Player(x, y);
   players.push(p1);
-  while (players.length > 0) {
+  let moved = true;
+  while (moved) {
+    moved = false;
+    let newDirections = [];
     for (let x in players) {
-      console.log('x', x);
       let [newx, newy] = players[x].nextLocation;
       let [oldx, oldy] = players[x].location;
-      let left = directions[players[x].direction].moves[0];
-      let right = directions[players[x].direction].moves[1];
-      if (dataArr[oldy + directions[left].y][oldx + directions[left].x] != '#') {
-        const p1 = new Player(oldx, oldy, left, players[x].score, ...players[x].path);
-        p1.turnLeft();
-        p1.move();
-        players.push(p1);
-        console.table(p1);
+
+      let tryLeft = new Player(oldx, oldy, players[x].direction, players[x].score, [...players[x].path]);
+      tryLeft.turnLeft();
+      let [leftx, lefty] = tryLeft.nextLocation;
+      let lv = dataArr[lefty][leftx];
+      let ls = tryLeft.location.toString() + ':' + tryLeft.direction;
+      if (lv == '.' || lv == 'x' && (!steps.hasOwnProperty(ls) || steps[ls] >= tryLeft.score)) {
+        newDirections.push(tryLeft);
+        steps[tryLeft.location.toString() + ':' + tryLeft.direction] = tryLeft.score;
+        moved = true;
       }
-      if (dataArr[oldy + directions[right].y][oldx + directions[right].x] != '#') {
-        const p1 = new Player(oldx, oldy, right, players[x].score, ...players[x].path);
-        p1.turnRight();
-        p1.move();
-        players.push(p1);
-        console.table(p1);
+
+      let tryRight = new Player(oldx, oldy, players[x].direction, players[x].score, [...players[x].path]);
+      tryRight.turnRight();
+      let [rightx, righty] = tryRight.nextLocation;
+      let rv = dataArr[righty][rightx];
+      let rs = tryRight.location.toString() + ":" + tryRight.direction;
+      if (rv == '.' || rv == 'x' && (!steps.hasOwnProperty(rs) || steps[rs] >= tryRight.score)) {
+        newDirections.push(tryRight);
+        steps[tryRight.location.toString() + ':' + tryRight.direction] = tryRight.score;
+        moved = true;
+      }
+
+      if (dataArr[newy][newx] == '.' || dataArr[newy][newx] == 'x') {
+        steps[players[x].location.toString() + ':' + players[x].direction] = players[x].score;
+        players[x].move();
+        dataArr[newy][newx] = 'x';
+        moved = true;
+      }
+      if (dataArr[newy][newx] == '#') {
+        players[x].kill();
       }
       if (dataArr[newy][newx] == 'E') {
-        winners.push(players.splice(x,1));
-      }
-      if (dataArr[newy][newx] != '#') {
         players[x].move();
+        moved = true;
+        winners.push(players[x]);
+        players[x].kill();
       }
     }
+    players = players.concat(newDirections);
+    players = players.filter(x => x.alive);
   }
 }
 
 
-console.table(dataArr);
 main(initX, initY);
-
+winners.sort((a, b) => a.score - b.score);
+console.table(winners);
+if (winners.length >= 1) {
+  console.log("Part1:",winners[0].score);
+  let score = winners[0].score;
+  winners = winners.filter(x => x.score == score);
+  let tiles = [];
+  for (let a of winners) {
+    for (let b of a.path) {
+      if(!tiles.includes(b.toString()))
+        tiles.push(b.toString());
+    }
+  }
+  console.log("Part2:", tiles.length);
+}
