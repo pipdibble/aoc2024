@@ -43,7 +43,7 @@ class Player {
   path = [];
   alive = true;
 
-  constructor(x, y, direction='east', score = 0, path = [], alive = true) {
+  constructor(x, y, direction = 'east', score = 0, path = [], alive = true) {
     this.x = x;
     this.y = y;
     this.direction = direction;
@@ -56,7 +56,7 @@ class Player {
   get location() {
     return [this.x, this.y];
   }
-  
+
   get direction() {
     return this.direction;
   }
@@ -84,7 +84,7 @@ class Player {
     this.direction = directions[this.direction].moves[0];
     this.score += 1000;
   }
-  
+
   turnRight() {
     this.direction = directions[this.direction].moves[1];
     this.score += 1000;
@@ -93,7 +93,7 @@ class Player {
   kill() {
     this.alive = false;
   }
-  
+
   get alive() {
     return this.alive;
   }
@@ -131,7 +131,7 @@ const main = (x, y) => {
       let ls = tryLeft.location.toString() + ':' + tryLeft.direction;
       if (lv == '.' || lv == 'x' && (!steps.hasOwnProperty(ls) || steps[ls] >= tryLeft.score)) {
         newDirections.push(tryLeft);
-        steps[tryLeft.location.toString() + ':' + tryLeft.direction] = tryLeft.score;
+        steps[ls] = tryLeft.score;
         moved = true;
       }
 
@@ -142,7 +142,7 @@ const main = (x, y) => {
       let rs = tryRight.location.toString() + ":" + tryRight.direction;
       if (rv == '.' || rv == 'x' && (!steps.hasOwnProperty(rs) || steps[rs] >= tryRight.score)) {
         newDirections.push(tryRight);
-        steps[tryRight.location.toString() + ':' + tryRight.direction] = tryRight.score;
+        steps[rs] = tryRight.score;
         moved = true;
       }
 
@@ -172,13 +172,13 @@ main(initX, initY);
 winners.sort((a, b) => a.score - b.score);
 console.table(winners);
 if (winners.length >= 1) {
-  console.log("Part1:",winners[0].score);
+  console.log("Part1:", winners[0].score);
   let score = winners[0].score;
   winners = winners.filter(x => x.score == score);
   let tiles = [];
   for (let a of winners) {
     for (let b of a.path) {
-      if(!tiles.includes(b.toString()))
+      if (!tiles.includes(b.toString()))
         tiles.push(b.toString());
     }
   }
